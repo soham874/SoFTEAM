@@ -3,6 +3,11 @@ import pandas as pd
 import ta
 import Common.constants as serviceConstants
 import json
+import numpy as np
+from sklearn.linear_model import LinearRegression
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+
 
 def __private_convert_data_to_DOHLCV(nsedtData):
 
@@ -15,6 +20,49 @@ def __private_convert_data_to_DOHLCV(nsedtData):
         'Close': nsedtData['Close Price'],
         'Volume': nsedtData['Total Traded Quantity']
     })
+  
+def __private_construct_regression_channel(processedStockDataList,reducedStockDataList, min_window=10, max_window=30):
+
+    best_upper = None
+    best_lower = None
+    best_median = None
+    best_window = None
+    best_error = float('inf')
+    
+    for window_size in range(min_window, max_window):
+        # Extract the last m2 rows from the OHLC data
+        data_subset = reducedStockDataList.tail(window_size)
+
+        # Extract features (X) and target (Y)
+        X = np.arange(len(data_subset)).reshape(-1, 1)
+        Y = data_subset['Close'].values
+
+        # Fit a straight line through the dataset
+        model = LinearRegression()
+        model.fit(X, Y)
+
+        # Predict Y values
+        predictions = model.predict(X)
+
+        # Calculate upper and lower bounds using Standard Deviation of +2 / -2
+        upper_bound = predictions + 2 * np.std(Y - predictions)
+        lower_bound = predictions - 2 * np.std(Y - predictions)
+
+        # Calculate the error in the estimation
+        error = np.sum((Y - predictions) ** 2)
+
+        # Update the best band if the current window size has a lower error
+        if error < best_error:
+            best_upper = upper_bound
+            best_lower = lower_bound
+            best_median = predictions
+
+            best_window = window_size
+            best_error = error
+
+    processedStockDataList['Regression Upper Band'] = np.concatenate(([None] * (processedStockDataList.shape[0] - len(best_upper)), best_upper))
+    processedStockDataList['Regression Lower Band'] = np.concatenate(([None] * (processedStockDataList.shape[0] - len(best_lower)), best_lower))
+    processedStockDataList['Regression Median'] = np.concatenate(([None] * (processedStockDataList.shape[0] - len(best_median)), best_median))
 
 # 1. volume(20) [vol > EMA]
 # 2. RSI (last 5 days) [val > 70 or val < 30]
@@ -58,5 +106,7 @@ def perform_and_return_ta_data(start_date,end_date,symbol):
     })
 
     processedStockDataList["VolumeDeviation"] = (processedStockDataList["Volume"]-processedStockDataList["VolumeEMA"])*100/processedStockDataList["VolumeEMA"]
+
+    __private_construct_regression_channel(processedStockDataList,reducedStockDataList)
 
     return processedStockDataList
