@@ -23,7 +23,7 @@ def generate_data(start_date, end_date, symbol):
     # if dataset empty, fetch new data and save it to csv
     if existing_data.empty:
         log.info("No data found between the requested range, fetching and saving new data")
-        new_data = fetch_data(start_date, end_date, symbol)
+        new_data = __private_fetch_data(start_date, end_date, symbol)
         new_data.to_csv(fileName, index=False)
         result = new_data
     
@@ -37,13 +37,13 @@ def generate_data(start_date, end_date, symbol):
         log.info("Dataset requested between %s and %s, but cached data present for %s and %s. Hence flushing old data and saving new.",start_date,end_date,existing_data['Date'].iloc[0],existing_data['Date'].iloc[-1])
         with open(fileName, 'w', newline=''):
             pass
-        new_data = fetch_data(start_date, end_date, symbol)
+        new_data = __private_fetch_data(start_date, end_date, symbol)
         new_data.to_csv(fileName, index=False)
         result =  new_data
     
     return result
 
-def fetch_data(start_date, end_date, symbol):
+def __private_fetch_data(start_date, end_date, symbol):
     log.info("Fetching data for Scripe %s between dates %s and %s from NSE", symbol,start_date,end_date)
     new_data = eq.get_price(start_date, end_date, symbol)
     print(new_data)
