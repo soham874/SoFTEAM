@@ -1,5 +1,5 @@
-from flask import Flask, request
-from Service import OHLCVdata, TaService, ConfigHandler
+from flask import Flask, request, send_file
+from Service import OHLCVdata, TaService, ConfigHandler, Plotter
 from datetime import datetime
 import Util.CommonUtils as commonUtils
 
@@ -35,6 +35,16 @@ def get_constants():
 def update_new_constants():
     new_constants_data = request.get_json()
     return ConfigHandler.update_new_data(new_constants_data)
+
+@app.route('/plotTaData', methods=['GET'])
+def generate_plot():
+    start_date = datetime.strptime(request.args.get('start_date'), '%Y-%m-%d')
+    end_date = datetime.strptime(request.args.get('end_date'), '%Y-%m-%d')
+    symbol = request.args.get('symbol')
+    
+    result_dataset = TaService.perform_and_return_ta_data(start_date,end_date,symbol)
+    return Plotter.generate_combined_image(result_dataset)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
