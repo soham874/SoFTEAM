@@ -19,8 +19,7 @@ Endpoint details are as follows
 | /getStockData?start_date=yyyy-mm-dd&end_date=yyyy-mm-dd&symbol=xxx | GET | start_date, end_date, symbol  | Fetch Historic OHLCV data for a stock from NSE, based on start and end date and stock code       |  https://nse-analyser.onrender.com/getStockData?start_date=2023-06-02&end_date=2024-01-01&symbol=ITC  |
 | /getStockTaData?start_date=yyyy-mm-dd&end_date=yyyy-mm-dd&symbol=xxx | GET | start_date, end_date, symbol  | Fetch calculated TA data for a stock from NSE, based on start and end date and stock code       |  https://nse-analyser.onrender.com/getStockTaData?start_date=2023-06-02&end_date=2024-01-01&symbol=ITC  |
 | /taConfigParams | GET | N/A  | Fetch the config values that will be used to calculate TA data  |  https://nse-analyser.onrender.com/taConfigParams  |
-| /taConfigParams | POST | JSON fetched from the above request with updated values as payload | Update the config values that will be used to calculate TA data  |  https://nse-analyser.onrender.com/taConfigParams  |
-
+| /taConfigParams | POST | JSON fetched from the above request with updated values as payload | Update the config values that will be used to calculate TA data  |  https://nse-analyser.onrender.com/taConfigParams  |=======
 
 ## Features
 

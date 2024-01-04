@@ -31,6 +31,7 @@ def generate_data(start_date, end_date, symbol):
     # if requested dataset is partially present, flush the old data and save a new one. Can be optimized later
     else:
         print(f"Dataset requested between {start_date} and {end_date}, but cached data present for {existing_data['Date'].iloc[0]} and {existing_data['Date'].iloc[-1]}. Hence flushing old data and saving new.")
+
         with open(fileName, 'w', newline=''):
             pass
         new_data = __private_fetch_data(start_date, end_date, symbol)
