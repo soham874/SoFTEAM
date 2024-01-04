@@ -1,10 +1,28 @@
-import Common.constants as serviceConst
-from Model import ReducedStockData
+import Service.OHLCVdata as OHLCVdata
+import pandas as pd
 
 def __private_convert_data_to_DOHLCV(nsedtData):
 
     # List to store the objects
-    result_list = [ReducedStockData(row['Date'], row['Open Price'], row['High Price'], row['Low Price'], row['Close Price'], row['Total Traded Quantity'])
-               for row in nsedtData.itertuples(index=False)]
+    return pd.DataFrame({
+        'Date': nsedtData['Date'],
+        'Open': nsedtData['Open Price'],
+        'High': nsedtData['High Price'],
+        'Low': nsedtData['Low Price'],
+        'Close': nsedtData['Close Price'],
+        'Volume': nsedtData['Total Traded Quantity']
+    })
 
-    return result_list
+def perform_and_return_ta_data(start_date,end_date,symbol):
+    
+    reducedStockDataList = __private_convert_data_to_DOHLCV(
+        OHLCVdata.generate_data(start_date,end_date,symbol)
+    )
+
+    processedStockDataList = pd.DataFrame({
+        'Date': reducedStockDataList['Date'],
+        'Close': reducedStockDataList['Close'],
+        'Volume': reducedStockDataList['Volume']
+    })
+
+    return processedStockDataList
