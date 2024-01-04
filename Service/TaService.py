@@ -8,6 +8,7 @@ from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
+
 def __private_convert_data_to_DOHLCV(nsedtData):
 
     # List to store the objects
@@ -19,7 +20,7 @@ def __private_convert_data_to_DOHLCV(nsedtData):
         'Close': nsedtData['Close Price'],
         'Volume': nsedtData['Total Traded Quantity']
     })
-
+  
 def __private_construct_regression_channel(processedStockDataList,reducedStockDataList, min_window=10, max_window=30):
 
     best_upper = None
@@ -62,7 +63,6 @@ def __private_construct_regression_channel(processedStockDataList,reducedStockDa
     processedStockDataList['Regression Upper Band'] = np.concatenate(([None] * (processedStockDataList.shape[0] - len(best_upper)), best_upper))
     processedStockDataList['Regression Lower Band'] = np.concatenate(([None] * (processedStockDataList.shape[0] - len(best_lower)), best_lower))
     processedStockDataList['Regression Median'] = np.concatenate(([None] * (processedStockDataList.shape[0] - len(best_median)), best_median))
-
 
 # 1. volume(20) [vol > EMA]
 # 2. RSI (last 5 days) [val > 70 or val < 30]
