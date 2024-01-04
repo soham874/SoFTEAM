@@ -42,8 +42,8 @@ def generate_plot():
     end_date = datetime.strptime(request.args.get('end_date'), '%Y-%m-%d')
     symbol = request.args.get('symbol')
     
-    result_dataset = TaService.perform_and_return_ta_data(start_date,end_date,symbol)
-    return Plotter.generate_combined_image(result_dataset)
+    #result_dataset = TaService.perform_and_return_ta_data(start_date,end_date,symbol)
+    return Plotter.plot_data()
 
 
 if __name__ == '__main__':
