@@ -3541,6 +3541,4 @@ def plot_data(inputData = data):
     )
 
     # Show the plot
-    fig.show()
-
-    return "200 OK"
+    return fig

@@ -1,7 +1,9 @@
-from flask import Flask, request, send_file
+from flask import Flask, request, send_file, render_template
 from Service import OHLCVdata, TaService, ConfigHandler, Plotter
 from datetime import datetime
 import Util.CommonUtils as commonUtils
+import plotly.io as pio
+import Common.constants as constants
 
 app = Flask(__name__)
 
@@ -43,7 +45,10 @@ def generate_plot():
     symbol = request.args.get('symbol')
     
     #result_dataset = TaService.perform_and_return_ta_data(start_date,end_date,symbol)
-    return Plotter.plot_data()
+    #return Plotter.plot_data()
+    fig_html = pio.to_html(Plotter.plot_data(), full_html=False)
+
+    return render_template("plot.html", plot=fig_html)
 
 
 if __name__ == '__main__':
