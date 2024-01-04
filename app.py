@@ -22,7 +22,7 @@ def health_check():
     return "200 OK"
 
 @app.route('/getStockData', methods=['GET'])
-def hello():
+def getStockData():
     # Get query parameters or use default values
     start_date_str = request.args.get('start_date')
     end_date_str = request.args.get('end_date')
