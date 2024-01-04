@@ -1,13 +1,23 @@
-A project to analyse data from the National Stock Exchange, to provide fundamental TA and recommendations on trade, with possibility to prepare and train models to predict stock trend. 
+A backend project to analyse data from the National Stock Exchange, to provide fundamental TA and recommendations on trade, with possibility to prepare and train models to predict stock trend. 
 
-Based on [ _nsedt_](https://github.com/pratik141/nsedt) module by pratik141 
+Based on [_nsedt_](https://github.com/pratik141/nsedt) module by pratik141 
 
 ## Current  Functionalities
 
-- Fetch Historic OHLCV data for a stock from NSE, based on start and end date and stock code. For eg :- Fetch data for ITC b/n 2023-06-02 and 2024-01-01
+Following table highlights the available endpoints, their details and examples.
+
+Base URL for the service is as follows :-
+
 ```
-http://localhost:5000/getStockData?start_date=2023-06-02&end_date=2024-01-01&symbol=ITC
+https://nse-analyser.onrender.com/
 ```
+Endpoint details are as follows
+
+| Endpoint  | Request Type | Parameters | Description | Example |
+| :---: | :---: | :---: |    :----:   |   :----:|
+| /health | GET | N/A  | Tells if the service is running       |  https://nse-analyser.onrender.com/health  |
+| /getStockData?start_date=yyyy-mm-dd&end_date=yyyy-mm-dd&symbol=xxx | GET | start_date,end_date,symbol  | Fetch Historic OHLCV data for a stock from NSE, based on start and end date and stock code       |  https://nse-analyser.onrender.com/getStockData?start_date=2023-06-02&end_date=2024-01-01&symbol=ITC  |
+
 
 ## Features
 
