@@ -1,5 +1,5 @@
 from flask import Flask, request
-from Service import OHLCVdata, TaService
+from Service import OHLCVdata, TaService, ConfigHandler
 from datetime import datetime
 import Util.CommonUtils as commonUtils
 
@@ -26,6 +26,15 @@ def getTaStockData():
     symbol = request.args.get('symbol')
     
     return commonUtils.jsonify_df_object(TaService.perform_and_return_ta_data(start_date,end_date,symbol)) 
+
+@app.route('/taConfigParams', methods=['GET'])
+def get_constants():
+    return ConfigHandler.return_existing_data()
+
+@app.route('/taConfigParams', methods=['POST'])
+def update_new_constants():
+    new_constants_data = request.get_json()
+    return ConfigHandler.update_new_data(new_constants_data)
 
 if __name__ == '__main__':
     app.run(debug=True)
