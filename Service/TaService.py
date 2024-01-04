@@ -36,9 +36,25 @@ def perform_and_return_ta_data(start_date,end_date,symbol):
     processedStockDataList = pd.DataFrame({
         'Date': reducedStockDataList['Date'],
         'Close': reducedStockDataList['Close'],
-        'CloseEMA': ta.trend.ema_indicator(close=reducedStockDataList['Close'], window=constants_data[serviceConstants.CLOSE_EMA_DURATION]),
+        'CloseEMA': ta.trend.ema_indicator(
+            close=reducedStockDataList['Close'], 
+            window=constants_data[serviceConstants.CLOSE_EMA_DURATION]),
         'Volume': reducedStockDataList['Volume'],
-        'VolumeEMA' : ta.trend.ema_indicator(close=reducedStockDataList['Volume'], window=constants_data[serviceConstants.VOLUME_EMA_DURATION]),
+        'VolumeEMA' : ta.trend.ema_indicator(
+            close=reducedStockDataList['Volume'], 
+            window=constants_data[serviceConstants.VOLUME_EMA_DURATION]),
+        'RSI' : ta.momentum.rsi(
+            close=reducedStockDataList['Close'], 
+            window=constants_data[serviceConstants.RSI_DURATION]),
+        'MACD' : ta.trend.macd(
+            close=reducedStockDataList['Close'], 
+            window_fast= constants_data[serviceConstants.MACD_FAST], 
+            window_slow= constants_data[serviceConstants.MACD_SLOW]),
+        'MACDSignal' : ta.trend.macd_signal( 
+            close=reducedStockDataList['Close'], 
+            window_fast= constants_data[serviceConstants.MACD_FAST], 
+            window_slow= constants_data[serviceConstants.MACD_SLOW], 
+            window_sign= constants_data[serviceConstants.MACD_SIGNAL_LENGTH])
     })
 
     processedStockDataList["VolumeDeviation"] = (processedStockDataList["Volume"]-processedStockDataList["VolumeEMA"])*100/processedStockDataList["VolumeEMA"]
