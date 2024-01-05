@@ -44,9 +44,9 @@ def generate_plot():
     end_date = datetime.strptime(request.args.get('end_date'), '%Y-%m-%d')
     symbol = request.args.get('symbol')
     
-    #result_dataset = TaService.perform_and_return_ta_data(start_date,end_date,symbol)
+    result_dataset = TaService.perform_and_return_ta_data(start_date,end_date,symbol)
     #return Plotter.plot_data()
-    fig_html = pio.to_html(Plotter.plot_data(), full_html=False)
+    fig_html = pio.to_html(Plotter.plot_data(result_dataset), full_html=False)
 
     return render_template("plot.html", plot=fig_html)
 

@@ -1,6 +1,24 @@
 from nsedt import equity as eq
 import pandas as pd
 import Common.constants as serviceConst
+from datetime import datetime, timedelta
+
+def __private_fetch_data(start_date, end_date, symbol):
+    print(f"Fetching data for Scripe {symbol} between dates {start_date} and {end_date} from NSE")
+    new_data = eq.get_price(start_date, end_date, symbol)
+    new_data['Date'] = pd.to_datetime(new_data['Date'], unit='ms')
+    return new_data
+
+def __private_check_if_trading_dates_present(date1, date2):
+    current_date = date1 + timedelta(days=1)  # Start from the next day of date1
+
+    while current_date < date2:
+        # Check if the current date is a weekday (0 is Monday, 6 is Sunday)
+        if current_date.weekday() < 5:  
+            return True
+        current_date += timedelta(days=1)
+
+    return False
 
 def generate_data(start_date, end_date, symbol):
 
@@ -39,9 +57,3 @@ def generate_data(start_date, end_date, symbol):
         result =  new_data
     
     return result
-
-def __private_fetch_data(start_date, end_date, symbol):
-    print(f"Fetching data for Scripe {symbol} between dates {start_date} and {end_date} from NSE")
-    new_data = eq.get_price(start_date, end_date, symbol)
-    new_data['Date'] = pd.to_datetime(new_data['Date'], unit='ms')
-    return new_data

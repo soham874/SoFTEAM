@@ -83,6 +83,9 @@ def perform_and_return_ta_data(start_date,end_date,symbol):
 
     processedStockDataList = pd.DataFrame({
         'Date': reducedStockDataList['Date'],
+        'Open' :  reducedStockDataList['Open'],
+        'High' : reducedStockDataList['High'],
+        'Low' : reducedStockDataList['Low'], 
         'Close': reducedStockDataList['Close'],
         'CloseEMA': ta.trend.ema_indicator(
             close=reducedStockDataList['Close'], 
