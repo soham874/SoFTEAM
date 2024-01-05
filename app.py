@@ -1,9 +1,8 @@
 from flask import Flask, request, send_file, render_template
-from Service import OHLCVdata, TaService, ConfigHandler, Plotter
+from Service import OHLCVdata, TaService, ConfigHandler, Plotter, TaResultAnalyser
 from datetime import datetime
 import Util.CommonUtils as commonUtils
 import plotly.io as pio
-import Common.constants as constants
 
 app = Flask(__name__)
 
@@ -50,6 +49,10 @@ def generate_plot():
 
     return render_template("plot.html", plot=fig_html)
 
+@app.route('/generateTaResult', methods=['GET'])
+def get_ta_result():
+    symbol = request.args.get('symbol')
+    return TaResultAnalyser.generate_analysis_results(symbol)
 
 if __name__ == '__main__':
     app.run(debug=True)
