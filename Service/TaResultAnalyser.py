@@ -8,7 +8,7 @@ def __private_add_analysis_fields(ta_data):
 
     return
 
-def generate_analysis_results(symbol):
+def __private_generate_analysis_results_for_single_symbol(symbol):
 
     # Get today's date
     end_date = datetime.now()
@@ -24,3 +24,13 @@ def generate_analysis_results(symbol):
     __private_add_analysis_fields(ta_data)
 
     return {"Stock":symbol,"Data":ta_data}
+
+def generate_stock_analysis_data(symbolListString):
+
+    symbolList = symbolListString.split(',')
+
+    result_set = []
+    for symbol in symbolList:
+        result_set.append(__private_generate_analysis_results_for_single_symbol(symbol))
+        
+    return result_set

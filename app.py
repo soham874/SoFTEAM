@@ -3,6 +3,7 @@ from Service import OHLCVdata, TaService, ConfigHandler, Plotter, TaResultAnalys
 from datetime import datetime
 import Util.CommonUtils as commonUtils
 import plotly.io as pio
+import json
 
 app = Flask(__name__)
 
@@ -50,9 +51,11 @@ def generate_plot():
     return render_template("plot.html", plot=fig_html)
 
 @app.route('/generateTaResult', methods=['GET'])
-def get_ta_result():
-    symbol = request.args.get('symbol')
-    return TaResultAnalyser.generate_analysis_results(symbol)
+def get_group_ta_result():
+    symbolList = request.args.get('symbolList')
+
+    #parsed_json_data = json.loads()
+    return render_template("ta_analysis_result.html",json_data=json.dumps(TaResultAnalyser.generate_stock_analysis_data(symbolList)))
 
 if __name__ == '__main__':
     app.run(debug=True)
