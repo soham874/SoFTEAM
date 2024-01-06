@@ -46,6 +46,7 @@
         <li>If MACD is greater than MACD signal, both the cells will be green. Otherwise both cells will be red.</li>
         <li>If traded volume deviated by more than 20 % from the Exponential Average Mean, the cell will be highlighted in yellow.</li>
         <li>If RSI is more than 70, it will be highlighted in Red. If RSI is lesser than 30, it will be highlighted in Green</li>
+        <li>The Regression value (upper band value / median / lower band value) to which the close was closest will be highlighted in yellow</li>
         <li>All Stock Scripe names link to their respective TradingView CandleChart</li>
     </ul>
     
@@ -63,7 +64,7 @@ function createCommonTable(inputData){
     document.body.appendChild(table);
 
     // Add table headers
-    const headers = ["Stock", "Date", "Open", "Close", "Regression Lower", "Regression Median", "Regression Upper", "RSI (Momentum)", "MACD", "MACD Signal", "Volume Deviation from Mean"];
+    const headers = ["Stock", "Date", "Open", "Close", "Regression Upper", "Regression Median", "Regression Lower", "RSI (Momentum)", "MACD", "MACD Signal", "Volume Deviation from Mean"];
     const headerRow = table.insertRow();
     headers.forEach(headerText => {
         const th = document.createElement("th");
@@ -90,7 +91,7 @@ function createCommonTable(inputData){
             stockCell.style.verticalAlign = "middle";
             stockCell.appendChild(stockLink);
 
-            const relevantFields = [ "Date", "Open", "Close", "Regression Lower Band", "Regression Median", "Regression Upper Band", "RSI", "MACD", "MACDSignal", "VolumeDeviation"];
+            const relevantFields = [ "Date", "Open", "Close", "Regression Upper Band", "Regression Median", "Regression Lower Band", "RSI", "MACD", "MACDSignal", "VolumeDeviation"];
             relevantFields.forEach(field => {
                 const cell = row.insertCell();
                 const value = rowData[field];
@@ -116,6 +117,30 @@ function createCommonTable(inputData){
                 else if (field === "VolumeDeviation" && Math.abs(value) > 20) {
                     cell.classList.add('yellow-bg');
                 }
+                
+                else if ( field === "Regression Lower Band" || field === "Regression Median" || field === "Regression Upper Band" ){
+                                        
+                    let v1,v2,v3
+
+                    if( field === "Regression Lower Band" ){
+                        v1 = value
+                        v2 = rowData["Regression Upper Band"]
+                        v3 = rowData["Regression Median"]
+                    } else if( field === "Regression Upper Band" ){
+                        v1 = value
+                        v2 = rowData["Regression Lower Band"]
+                        v3 = rowData["Regression Median"]
+                    } else {
+                        v1 = value
+                        v2 = rowData["Regression Upper Band"]
+                        v3 = rowData["Regression Lower Band"]
+                    }
+
+                    if( (get_abs_deviation(v1,rowData.Close) < get_abs_deviation(v2,rowData.Close)) && (get_abs_deviation(v1,rowData.Close) < get_abs_deviation(v3,rowData.Close)))
+                        cell.classList.add('yellow-bg');
+
+                }
+
             });
 
             // Hide Stock column for subsequent rows
@@ -123,6 +148,10 @@ function createCommonTable(inputData){
         });
 
     })
+}
+
+function get_abs_deviation(value1, value2){
+    return Math.abs( (value1 - value2)/value1 )
 }
 
 </script>
