@@ -8,6 +8,7 @@ class KiteService:
 
     def __init__(self,totp = None):
         self.conf = ConfigReader()
+        self.log = get_logger(__name__)
 
         self.__headers = None
         self.__kite_login(totp)
@@ -23,17 +24,17 @@ class KiteService:
         }
 
     def __check_and_load_auth_from_file(self):
-        log = get_logger(__name__)
+        
         if os.path.exists(const.KITE_AUTH_HEADERS):
-            log.info("Pre-existing auth headers file found, loading")
+            self.log.info("Pre-existing auth headers file found, loading")
             with open(const.KITE_AUTH_HEADERS, 'rb') as auth_file:
                 encoded_data = auth_file.read()
                 decoded_data = base64.b64decode(encoded_data)
                 self.__headers = json.loads(decoded_data.decode('utf-8'))
-                log.info("Auth headers loaded successfully")
+                self.log.info("Auth headers loaded successfully")
                 return 'Already logged in, auth headers loaded successfully'
         else:
-            log.info("Auth file not found, need to authenticate")
+            self.log.info("Auth file not found, need to authenticate")
             return None
             
     """
@@ -41,8 +42,6 @@ class KiteService:
     headers will be fetched, cached and loaded
     """
     def __kite_login(self,totp):
-
-        log = get_logger(__name__)
         
         res = self.__check_and_load_auth_from_file()
 
@@ -50,7 +49,7 @@ class KiteService:
             return 
         
         if totp is None:
-            raise Exception ('Not already logging in, manual OTP is required to authenticate')
+            raise Exception ('Not already logged in, manual OTP is required to authenticate')
         
         login_creds = {
             'user_id' : self.conf.get_config_from_env_or_file('KITE_USER_ID'),
@@ -59,7 +58,7 @@ class KiteService:
         }
 
         session = requests.Session() 
-        log.info("Sending request to Kite to initiate 2FA")
+        self.log.info("Sending request to Kite to initiate 2FA")
 
         res1 = session.post(
             'https://kite.zerodha.com/api/login',
@@ -70,11 +69,11 @@ class KiteService:
         ) 
         loginRes = res1.json() 
         
-        log.info(f"Response received -> {loginRes}")
+        self.log.info(f"Response received -> {loginRes}")
         if not 200 <= res1.status_code < 300:
             raise Exception (res1.text)
 
-        log.info("Sending request to fetch auth header with supplied OTP")
+        self.log.info("Sending request to fetch auth header with supplied OTP")
 
         finalRes = session.post(
             'https://kite.zerodha.com/api/twofa',
@@ -86,7 +85,7 @@ class KiteService:
             }
         ) 
         
-        log.info(f"Response received -> {finalRes.json()}")
+        self.log.info(f"Response received -> {finalRes.json()}")
         if not 200 <= finalRes.status_code < 300:
             raise Exception (finalRes.text)
 
@@ -97,14 +96,14 @@ class KiteService:
             "cookie": f"kf_session={session_info['kf_session']}; __cf_bm={session_info['__cf_bm']}; _cfuvid={session_info['_cfuvid']}; public_token={session_info['public_token']}",
             "Authorization": f"enctoken {session_info['enctoken']}"
         }
-        log.info("Auth headers cached successfully")
+        self.log.info("Auth headers cached successfully")
 
         json_string = json.dumps(self.__headers)
         encoded_data = base64.b64encode(json_string.encode('utf-8'))
         with open(const.KITE_AUTH_HEADERS, 'wb') as file:
             file.write(encoded_data)
 
-        log.info("Auth headers fetched and cached successfully")
+        self.log.info("Auth headers fetched and cached successfully")
     
     """
     Generic private function to execute class to Kite backend.
@@ -120,3 +119,19 @@ class KiteService:
             data=data,
             headers=self.__headers
         ).json()
+    
+    """
+    Fetch different information from Kite profile
+    """
+    def execute_method(self,method):
+
+        self.log.info(f"Fetching data for {method}")
+        
+        extension = self.__extensions[method]
+        if extension is None:
+            raise Exception (f'Requested method -> {method} does not have an extension registered')
+
+        return self.__execute_call(
+            method="GET",
+            extension=extension
+        )

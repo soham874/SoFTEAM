@@ -15,6 +15,11 @@ class JsonFormatter(logging.Formatter):
 
 def get_logger(name):
     logger = logging.getLogger(name)
+    logger.propagate = False
+    
+    if logger.hasHandlers():
+        logger.handlers.clear()
+
     logger.setLevel(logging.DEBUG)
 
     handler = logging.StreamHandler()
