@@ -1,6 +1,9 @@
 
 FROM python:latest
 
+ENV KITE_USER_ID=''
+ENV KITE_PASSWORD=''
+
 RUN pip install --upgrade pip
 
 # We copy just the requirements.txt first to leverage Docker cache
