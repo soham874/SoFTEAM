@@ -1,6 +1,9 @@
 
 FROM python:latest
 
+ENV KITE_USER_ID=''
+ENV KITE_PASSWORD=''
+
 RUN pip install --upgrade pip
 
 # We copy just the requirements.txt first to leverage Docker cache
@@ -22,4 +25,3 @@ USER 10000
 CMD ["gunicorn","--timeout","600","--workers","4", "app:app", "--bind", "0.0.0.0:8080"]
 
 # clear && docker build -t nse_analyser . && docker container rm nse_analyser && docker run --name nse_analyser -it -p 8080:8080 nse_analyser
-# clear && docker build -t nse_analyser . && docker run --name nse_analyser -it -p 8080:8080 nse_analyser
