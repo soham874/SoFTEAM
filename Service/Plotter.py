@@ -4255,7 +4255,7 @@ data = [
 
 def plot_data(inputData = data):
 
-    inputData = data
+    # inputData = data
 
     x_axis = list(range(1,len(inputData)))
 
