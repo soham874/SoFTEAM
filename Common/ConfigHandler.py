@@ -24,3 +24,10 @@ def update_new_data(new_constants_data):
         return jsonify({"message": "Constants updated successfully"})
     else:
         return jsonify({"error": "Invalid JSON data provided"}), 400
+    
+
+def return_existing_data_dict():
+    # Read the initial JSON data from the file
+    with open(serviceConst.TA_PARAM_FILE_PATH, 'r') as json_file:
+        constants_data = json.load(json_file)
+    return constants_data

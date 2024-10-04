@@ -1,4 +1,4 @@
-import Service.OHLCVdata as OHLCVdata
+import Service.TA.OHLCVdata as OHLCVdata
 import pandas as pd
 import ta
 import Common.constants as serviceConstants

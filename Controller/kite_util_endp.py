@@ -1,6 +1,6 @@
 from flask import Blueprint, request
 from Common.log_config import get_logger
-from Service.KiteService import KiteService
+from Service.Kite.KiteService import KiteService
 import traceback
 
 kite_util = Blueprint('kite_util', __name__)

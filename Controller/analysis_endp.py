@@ -1,5 +1,6 @@
+from Common import ConfigHandler
 from flask import Blueprint, request, render_template
-from Service import OHLCVdata, TaService, ConfigHandler, Plotter, TaResultAnalyser
+from Service.TA import OHLCVdata, TaService, Plotter, TaResultAnalyser
 from datetime import datetime
 import Util.CommonUtils as commonUtils
 import plotly.io as pio
