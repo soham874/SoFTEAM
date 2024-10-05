@@ -1,12 +1,3 @@
-"""
-Every minute;
-1. Fetch feed for all RSS URLs. Filter out feed data for last 30 min.
-2. Maintain a cache with TTL of 60 min. If the current feed title does not exist in the cache, push it and add it to processinglist
-3. Filter the processinglist to find unique titles
-4. For each of this title, analyse the news
-
-"""
-
 from Common.log_config import get_logger
 from Service import ConfigHandler
 import feedparser
@@ -14,12 +5,15 @@ from newspaper import Article
 import html, time, json, requests, traceback, os
 from expiring_dict import ExpiringDict
 from bs4 import BeautifulSoup
+import Common.constants as constants
 
 class RssConsumer:
 
     def __init__(self) -> None:
         self.log = get_logger(__name__)
-        self.cache = ExpiringDict(900)
+        self.cache = ExpiringDict(
+            ConfigHandler.fetch_value_from_config(constants.RSS_PARAM_FILE_PATH,"cache_ttl_sec")
+        )
         pass
 
     def __fetch_resources(self,url):
@@ -37,13 +31,8 @@ class RssConsumer:
         return response.text
 
     def fetch_new_feed(self):
-        url_list = ["https://www.businesstoday.in/rssfeeds/?id=home",
-                    "https://rss.app/feeds/tgll9PXJFaUoCjGV.xml",
-                    "https://www.livemint.com/rss/industry",
-                    "https://www.livemint.com/rss/markets",
-                    "https://www.livemint.com/rss/companies",
-                    "https://www.business-standard.com/rss/markets-106.rss"]
-        window_min = 60*6
+        url_list = ConfigHandler.fetch_value_from_config(constants.RSS_PARAM_FILE_PATH,"rss_url_list")
+        window_min = ConfigHandler.fetch_value_from_config(constants.RSS_PARAM_FILE_PATH,"consider_window_article_min")
         
         feed = []
         for url in url_list:

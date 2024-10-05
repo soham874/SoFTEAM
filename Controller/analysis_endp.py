@@ -1,4 +1,3 @@
-from Service import ConfigHandler
 from flask import Blueprint, request, render_template
 from Service.TA import OHLCVdata, TaService, Plotter, TaResultAnalyser
 from datetime import datetime
@@ -25,15 +24,6 @@ def getTaStockData():
     symbol = request.args.get('symbol')
     
     return commonUtils.jsonify_df_object(TaService.perform_and_return_ta_data(start_date,end_date,symbol)) 
-
-@analysis_endp.route('/taConfigParams', methods=['GET'])
-def get_constants():
-    return ConfigHandler.return_existing_data()
-
-@analysis_endp.route('/taConfigParams', methods=['POST'])
-def update_new_constants():
-    new_constants_data = request.get_json()
-    return ConfigHandler.update_new_data(new_constants_data)
 
 @analysis_endp.route('/plotTaData', methods=['GET'])
 def generate_plot():

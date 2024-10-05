@@ -6,6 +6,8 @@ import os, random, time, json
 from Controller.analysis_endp import analysis_endp
 from Controller.kite_util_endp import kite_util
 from Controller.config_controller import config_handler
+import Common.constants as constants
+from Service import ConfigHandler
 
 app = Flask(__name__)
 
@@ -27,6 +29,8 @@ if not os.path.exists('lockfile'):
         scheduler.init_app(app)
         scheduler.start()
 
-        @scheduler.task('interval', id='rss_news_analyser', seconds=30)
+        @scheduler.task('interval', 
+                        id='rss_news_analyser', 
+                        seconds=ConfigHandler.fetch_value_from_config(constants.RSS_PARAM_FILE_PATH,"feed_check_duration_sec"))
         def refresh_feed():
             print(f"New news length -> {json.dumps(rssConsumer.prepare_feed_data())}")
