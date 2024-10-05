@@ -59,7 +59,7 @@ if not os.path.exists('lockfile'):
                         yield (f"data:{json.dumps({'batch': batch_identifier, 'data': cached_articles.pop(0)})}\n\n").encode('utf-8')
                         batch_count += 1
                         
-                    time.sleep(5)
+                    time.sleep(1)
                     
 
             return Response(generate(), mimetype='text/event-stream')

@@ -7,5 +7,5 @@
                     "https://www.business-standard.com/rss/markets-106.rss"],
     "consider_window_article_min" : 60,
     "feed_check_duration_sec" : 30,
-    "cache_ttl_sec" : 900
+    "cache_ttl_sec" : 7200
 }
