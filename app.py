@@ -1,7 +1,7 @@
-from flask import Flask
+from flask import Flask, Response
 from flask_apscheduler import APScheduler
 from Service.NewsAnalysis.RssConsumer import RssConsumer
-import os, random, time, json
+import os, random, time, json, time
 
 from Controller.analysis_endp import analysis_endp
 from Controller.kite_util_endp import kite_util
@@ -29,8 +29,23 @@ if not os.path.exists('lockfile'):
         scheduler.init_app(app)
         scheduler.start()
 
+        cached_articles = []
+
         @scheduler.task('interval', 
                         id='rss_news_analyser', 
                         seconds=ConfigHandler.fetch_value_from_config(constants.RSS_PARAM_FILE_PATH,"feed_check_duration_sec"))
         def refresh_feed():
-            print(f"New news length -> {json.dumps(rssConsumer.prepare_feed_data())}")
+            new_articles = rssConsumer.prepare_feed_data()
+            cached_articles.append(new_articles)
+            print(f"New news length -> {len(new_articles)}")
+
+        @app.route('/cached-articles')
+        def get_cached_articles():
+
+            def generate():
+                while True:
+                    if cached_articles and cached_articles[0]:
+                        yield (json.dumps(cached_articles.pop(0))+"\n").encode('utf-8')
+                    time.sleep(5)
+
+            return Response(generate(), mimetype='text/event-stream')

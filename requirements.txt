@@ -12,3 +12,4 @@ lxml_html_clean==0.2.2
 Flask-APScheduler==1.13.1
 expiring-dict
 bs4
+eventlet

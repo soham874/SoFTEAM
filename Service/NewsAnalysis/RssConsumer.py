@@ -6,11 +6,13 @@ import html, time, json, requests, traceback, os
 from expiring_dict import ExpiringDict
 from bs4 import BeautifulSoup
 import Common.constants as constants
+from Common.config_reader import ConfigReader
 
 class RssConsumer:
 
-    def __init__(self) -> None:
+    def __init__(self):
         self.log = get_logger(__name__)
+        self.log.setLevel(ConfigReader().get_config_from_env_or_file('LOGGING_LEVEL_CRON'))
         self.cache = ExpiringDict(
             ConfigHandler.fetch_value_from_config(constants.RSS_PARAM_FILE_PATH,"cache_ttl_sec")
         )
@@ -32,6 +34,7 @@ class RssConsumer:
 
     def fetch_new_feed(self):
         url_list = ConfigHandler.fetch_value_from_config(constants.RSS_PARAM_FILE_PATH,"rss_url_list")
+        self.log.debug(f"List of URLs to fetch feed from -> {url_list}")
         window_min = ConfigHandler.fetch_value_from_config(constants.RSS_PARAM_FILE_PATH,"consider_window_article_min")
         
         feed = []
@@ -83,6 +86,7 @@ class RssConsumer:
             return article.text
         
         # Strategy 2
+        self.log.warning(f"Strategy Newspaper3K failed to create article for URL f{url}, trying Beautiful Soup")
         soup = BeautifulSoup(article.html, 'html.parser')
 
         script_tags = soup.find_all('script', type='application/ld+json')
@@ -98,7 +102,11 @@ class RssConsumer:
             except json.JSONDecodeError:
                 continue 
         
-        return article_body
+        if article_body:
+            return article_body
+
+        self.log.error(f"All extraction strategies failed for article f{url}")   
+        return None
     
     def prepare_feed_data(self):
         new_feed = self.fetch_new_feed()
@@ -109,11 +117,12 @@ class RssConsumer:
                 'source' : item.title_detail.base,
                 'title' : html.unescape(item.title),
                 'published_date' : item.published,
+                'article_url' : item.links[0]['href'],
                 'text' : html.unescape(self.get_summary(item.links[0]['href']))
             }
 
-        if not os.path.exists('Resources/news_dump.json'):
-            with open("Resources/news_dump.json", 'w') as json_file:
-                json.dump(formatted_news, json_file, indent=4)
+        # if not os.path.exists('Resources/news_dump.json'):
+        #     with open("Resources/news_dump.json", 'w') as json_file:
+        #         json.dump(formatted_news, json_file, indent=4)
 
-        return len(formatted_news)
+        return formatted_news

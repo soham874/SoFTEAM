@@ -1,6 +1,4 @@
 from flask import Blueprint, request
-from Common.log_config import get_logger
-from Service.Kite.KiteService import KiteService
 import traceback
 from Service import ConfigHandler
 import Common.constants as serviceConst
