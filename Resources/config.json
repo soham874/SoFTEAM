@@ -5,6 +5,5 @@
     "macd_slow": 26,
     "macd_fast": 12,
     "macd_signal_length": 9,
-    "consider_days_for_ta_report": 5,
-    "rss_urls": ["https://www.businesstoday.in/rssfeeds/?id=home","https://rss.app/feeds/tgll9PXJFaUoCjGV.xml"]
+    "consider_days_for_ta_report": 5
 }

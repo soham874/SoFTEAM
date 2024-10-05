@@ -1,4 +1,4 @@
-from Common import ConfigHandler
+from Service import ConfigHandler
 from flask import Blueprint, request, render_template
 from Service.TA import OHLCVdata, TaService, Plotter, TaResultAnalyser
 from datetime import datetime

@@ -20,7 +20,7 @@ def get_logger(name):
     if logger.hasHandlers():
         logger.handlers.clear()
 
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
 
     handler = logging.StreamHandler()
     handler.setLevel(logging.DEBUG)
