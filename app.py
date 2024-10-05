@@ -29,4 +29,4 @@ if not os.path.exists('lockfile'):
 
         @scheduler.task('interval', id='rss_news_analyser', seconds=30)
         def refresh_feed():
-            print(f"New news -> {json.dumps(rssConsumer.prepare_feed_data())}")
+            print(f"New news length -> {json.dumps(rssConsumer.prepare_feed_data())}")

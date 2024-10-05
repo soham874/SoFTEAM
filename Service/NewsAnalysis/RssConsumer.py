@@ -11,8 +11,9 @@ from Common.log_config import get_logger
 from Service import ConfigHandler
 import feedparser
 from newspaper import Article
-import html, time
+import html, time, json, requests, traceback, os
 from expiring_dict import ExpiringDict
+from bs4 import BeautifulSoup
 
 class RssConsumer:
 
@@ -21,6 +22,20 @@ class RssConsumer:
         self.cache = ExpiringDict(900)
         pass
 
+    def __fetch_resources(self,url):
+        response = requests.request(
+            method="GET",
+            headers={
+                "User-Agent": "insomnium/0.2.3-a"
+            },
+            url=url
+        )
+                
+        if not 200 <= response.status_code < 400:
+            raise Exception (f"Failed to fetch feed from RSS {url}")
+        
+        return response.text
+
     def fetch_new_feed(self):
         url_list = ["https://www.businesstoday.in/rssfeeds/?id=home",
                     "https://rss.app/feeds/tgll9PXJFaUoCjGV.xml",
@@ -28,17 +43,23 @@ class RssConsumer:
                     "https://www.livemint.com/rss/markets",
                     "https://www.livemint.com/rss/companies",
                     "https://www.business-standard.com/rss/markets-106.rss"]
-        window_min = 60
+        window_min = 60*6
         
         feed = []
         for url in url_list:
-            self.log.debug(f"Fetching data from URL {url}")
-            feedData = feedparser.parse(url)
+            try:
+                self.log.debug(f"Fetching data from URL {url}")
 
-            # if not 200 <= feedData.status < 300:
-            #     raise Exception (f"Failed to fetch feed from RSS {url}")
-            
-            feed += feedData.entries
+                response = self.__fetch_resources(url)
+                feedData = feedparser.parse(response)
+
+                for entry in feedData.entries:
+                    entry.title_detail.base = url
+
+                feed += feedData.entries
+
+            except Exception:
+                traceback.print_exc()
 
         self.log.debug(f"Fetched all RSS data from input URLs. Feed size -> {len(feed)}. Filtering fresh data in last {window_min} minutes.")
 
@@ -62,10 +83,33 @@ class RssConsumer:
         return feed
     
     def get_summary(self,url):
-        article = Article(url)
-        article.download()
+
+        # Strategy 1
+        article_html = self.__fetch_resources(url)
+        article = Article('')
+        article.set_html(article_html)
+
         article.parse()
-        return article.text
+        if article.text != '':
+            return article.text
+        
+        # Strategy 2
+        soup = BeautifulSoup(article.html, 'html.parser')
+
+        script_tags = soup.find_all('script', type='application/ld+json')
+
+        article_body = None
+
+        for script_tag in script_tags:
+            try:
+                data = json.loads(script_tag.string)
+                if data.get('@type') == 'NewsArticle':
+                    article_body = data.get('articleBody')
+                    break 
+            except json.JSONDecodeError:
+                continue 
+        
+        return article_body
     
     def prepare_feed_data(self):
         new_feed = self.fetch_new_feed()
@@ -73,9 +117,14 @@ class RssConsumer:
         formatted_news = {}
         for item in new_feed:
             formatted_news[item.title] = {
+                'source' : item.title_detail.base,
                 'title' : html.unescape(item.title),
                 'published_date' : item.published,
                 'text' : html.unescape(self.get_summary(item.links[0]['href']))
             }
 
-        return formatted_news
+        if not os.path.exists('Resources/news_dump.json'):
+            with open("Resources/news_dump.json", 'w') as json_file:
+                json.dump(formatted_news, json_file, indent=4)
+
+        return len(formatted_news)
