@@ -20,7 +20,7 @@ def get_logger(name):
     if logger.hasHandlers():
         logger.handlers.clear()
 
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
 
     handler = logging.StreamHandler()
     handler.setLevel(logging.DEBUG)
@@ -29,5 +29,16 @@ def get_logger(name):
     handler.setFormatter(formatter)
 
     logger.addHandler(handler)
+
+    # Create a file handler to log warnings and errors to a file
+    file_handler = logging.FileHandler(f'Logs/{name}.log')
+    file_handler.setLevel(logging.WARNING)  # Set to capture warnings and above
+
+    # Create a formatter for the log messages
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    file_handler.setFormatter(formatter)
+
+    # Add the file handler to the logger
+    logger.addHandler(file_handler)
 
     return logger

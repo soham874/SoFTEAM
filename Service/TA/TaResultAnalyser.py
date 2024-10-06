@@ -1,4 +1,4 @@
-from Service import TaService
+from Service.TA import TaService
 from Util import CommonUtils
 from datetime import datetime, timedelta
 import pandas as pd
