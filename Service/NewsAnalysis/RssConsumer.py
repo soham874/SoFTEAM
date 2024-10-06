@@ -28,7 +28,7 @@ class RssConsumer:
         )
                 
         if not 200 <= response.status_code < 400:
-            raise Exception (f"Failed to fetch feed from RSS {url}")
+            self.log.error(f"Failed to fetch resource from URL {url} with status code {response.status_code}")
         
         return response.text
 
@@ -59,8 +59,11 @@ class RssConsumer:
         window = window_min*60
 
         for i in range(len(feed)-1 , -1, -1):
-            published_ts = time.mktime(feed[i].get('published_parsed'))
-            if current_timestamp - published_ts > window:
+            if feed[i].get('published_parsed'):
+                published_ts = time.mktime(feed[i].get('published_parsed'))
+                if current_timestamp - published_ts > window:
+                    del feed[i]
+            else:
                 del feed[i]
 
         self.log.debug(f"Filtered fresh data. Feed size -> {len(feed)}. Filtering based on previous processed cache")
@@ -76,7 +79,7 @@ class RssConsumer:
     
     def get_summary(self,url):
 
-        # Strategy 1
+        # NewsPaper 3K
         article_html = self.__fetch_resources(url)
         article = Article('')
         article.set_html(article_html)
@@ -85,7 +88,7 @@ class RssConsumer:
         if article.text != '':
             return article.text
         
-        # Strategy 2
+        # Beautiful Soup
         self.log.warning(f"Strategy Newspaper3K failed to create article for URL {url}, trying Beautiful Soup")
         soup = BeautifulSoup(article.html, 'html.parser')
 
@@ -106,23 +109,22 @@ class RssConsumer:
             return article_body
 
         self.log.error(f"All extraction strategies failed for article {url}")   
-        return None
+        return ''
     
     def prepare_feed_data(self):
         new_feed = self.fetch_new_feed()
 
         formatted_news = {}
         for item in new_feed:
-            formatted_news[item.title] = {
-                'source' : item.title_detail.base,
-                'title' : html.unescape(item.title),
-                'published_date' : item.published,
-                'article_url' : item.links[0]['href'],
-                'text' : html.unescape(self.get_summary(item.links[0]['href']))
-            }
-
-        # if not os.path.exists('Resources/news_dump.json'):
-        #     with open("Resources/news_dump.json", 'w') as json_file:
-        #         json.dump(formatted_news, json_file, indent=4)
+            if item and item.links[0] and item.links[0]['href']:
+                formatted_news[item.title] = {
+                    'source' : item.title_detail.base,
+                    'title' : html.unescape(item.title),
+                    'published_date' : item.published,
+                    'article_url' : item.links[0]['href'],
+                    'text' : html.unescape(self.get_summary(item.links[0]['href']))
+                }
+            else:
+                self.log.error(f"Skipping article '{html.unescape(item.title)}' from source {item.title_detail.base} because no article link was found")
 
         return formatted_news
