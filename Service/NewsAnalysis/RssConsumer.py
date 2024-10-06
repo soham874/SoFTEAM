@@ -86,7 +86,7 @@ class RssConsumer:
             return article.text
         
         # Strategy 2
-        self.log.warning(f"Strategy Newspaper3K failed to create article for URL f{url}, trying Beautiful Soup")
+        self.log.warning(f"Strategy Newspaper3K failed to create article for URL {url}, trying Beautiful Soup")
         soup = BeautifulSoup(article.html, 'html.parser')
 
         script_tags = soup.find_all('script', type='application/ld+json')
@@ -105,7 +105,7 @@ class RssConsumer:
         if article_body:
             return article_body
 
-        self.log.error(f"All extraction strategies failed for article f{url}")   
+        self.log.error(f"All extraction strategies failed for article {url}")   
         return None
     
     def prepare_feed_data(self):

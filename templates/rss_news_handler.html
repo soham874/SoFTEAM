@@ -34,10 +34,17 @@
         const eventSource = new EventSource('/cached-articles');
         const newsContainer = document.getElementById('news-container');
 
+        // Set up audio for notifications
+        const notificationSound = new Audio('/static/notification.wav'); // Place your notification sound in the same directory
+        // Request permission to show notifications
+        if (Notification.permission !== "granted") {
+            Notification.requestPermission();
+        }
+
         // Listen for messages (JSON data)
         eventSource.onmessage = function(event) {
             const { batch, data } = JSON.parse(event.data);
-            console.log(`Received and processing batch ${batch.split('_')[1]}`);
+            //console.log(`Received and processing batch ${batch.split('_')[1]}`);
 
             for (let key in data) {
                 if (data.hasOwnProperty(key)) {
@@ -55,6 +62,16 @@
                     `;
                     newsContainer.prepend(newsItem);  // Add the new news item at the top
                 }
+            }
+
+            // Show a browser notification for new updates
+            if (Notification.permission === "granted") {
+                const notification = new Notification("New updates available!", {
+                    body: `New articles have been loaded. Check it out!`
+                });
+
+                // Play notification sound
+                notificationSound.play();
             }
         };
 
