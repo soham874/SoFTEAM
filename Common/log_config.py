@@ -1,5 +1,6 @@
 import logging
 import json
+import os
 
 class JsonFormatter(logging.Formatter):
     def format(self, record):
@@ -29,6 +30,10 @@ def get_logger(name):
     handler.setFormatter(formatter)
 
     logger.addHandler(handler)
+
+    if not os.path.exists('Logs'):
+        os.makedirs('Logs')
+
 
     # Create a file handler to log warnings and errors to a file
     file_handler = logging.FileHandler(f'Logs/{name}.log')
