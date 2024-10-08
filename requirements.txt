@@ -3,7 +3,7 @@ nsedt==0.0.12
 gunicorn>=22.0.0
 ta==0.11.0
 scikit-learn
-matplotlib==3.8.2
+matplotlib
 plotly==5.18.0
 gevent==23.9.1
 feedparser==6.0.11
@@ -13,3 +13,4 @@ Flask-APScheduler==1.13.1
 expiring-dict
 bs4
 eventlet
+redis
