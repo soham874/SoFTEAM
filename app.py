@@ -1,6 +1,6 @@
-from flask import Flask
+from flask import Flask, request
 from Service.NewsAnalysis.RssConsumer import RssConsumer
-import os, random, time, json, time, traceback
+import os, random, time, time
 from Common.log_config import get_logger
 
 app = Flask(__name__)
@@ -24,3 +24,7 @@ init_scheduler(app, log)
 @app.route('/health')
 def health_check():
     return "200 OK"
+
+@app.route('/', methods = ["GET"])
+def upstox_code():
+    return {'code':request.args.get('code')}, 200

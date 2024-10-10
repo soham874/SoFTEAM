@@ -89,7 +89,7 @@ class RssConsumer:
             return article.text
         
         # Beautiful Soup
-        self.log.warning(f"Strategy Newspaper3K failed to create article for URL {url}, trying Beautiful Soup")
+        # self.log.warning(f"Strategy Newspaper3K failed to create article for URL {url}, trying Beautiful Soup")
         soup = BeautifulSoup(article.html, 'html.parser')
 
         script_tags = soup.find_all('script', type='application/ld+json')

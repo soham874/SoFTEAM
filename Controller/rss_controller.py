@@ -2,7 +2,8 @@ from flask import Response, render_template, Blueprint
 from flask_apscheduler import APScheduler
 from Service.NewsAnalysis.RssConsumer import RssConsumer
 import os, time, json, time, traceback
-from Service.Redis import store_dict, get_dict, modify_with_lock
+from Service.Redis import get_dict, modify_with_lock, append_to_list, get_list
+from datetime import datetime
 
 import Common.constants as constants
 from Service import ConfigHandler
@@ -17,25 +18,30 @@ def init_scheduler(app, log):
     scheduler.init_app(app)
     scheduler.start()
 
-    # @scheduler.task('interval', 
-    #                 id='feed_size', 
-    #                 seconds=10)
-    # def check_feed_data():
-    #     log.info(f'shared dict -> {get_dict(feed_key)}')
-
     if not os.path.exists('lockfile'):
+        log.info("Starting feed maintainance activity")
         with open('lockfile', 'w') as f:
-            
+            modify_with_lock(feed_key,None)
             @scheduler.task('interval', 
                             id='rss_news_analyser', 
                             seconds=ConfigHandler.fetch_value_from_config(constants.RSS_PARAM_FILE_PATH,"feed_check_duration_sec"))
             def refresh_feed():
-                log.info("Updating feed...")
                 new_articles = rssConsumer.prepare_feed_data()
+
                 if new_articles:
+
                     modify_with_lock(feed_key,new_articles)
-                    #log.info(new_articles)
-                log.info(f"New news length -> {len(new_articles)}")
+                    log.info(f"Publishing {len(new_articles)} new articles")
+                    
+                    published_ts = datetime.now().isoformat()
+                    for article in new_articles.values():
+                        append_to_list(
+                            'published-articles',{
+                                'title' : article['title'],
+                                'published_ts' : published_ts,
+                                'article_link' : article['article_url']
+                            }
+                        )
 
 @rss_controller.route('/cached-articles')
 def get_cached_articles():
@@ -55,6 +61,16 @@ def get_cached_articles():
                     
 
     return Response(generate(), mimetype='text/event-stream')
+
+@rss_controller.route('/fetch-published-articles')
+def fetch_published_articles_list():
+    try:
+        return json.dumps(
+            [json.loads(item) for item in get_list('published-articles')],
+            indent=4
+        ), 200
+    except:
+        traceback.print_exc()
 
 @rss_controller.route('/live-news-feed')
 def handle_rss_field():

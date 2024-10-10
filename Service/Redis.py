@@ -13,6 +13,10 @@ def get_dict(key):
         return json.loads(data)
     return None
 
+def get_list(key):
+    # Retrieve and deserialize the dictionary
+    return redis_client.lrange(key, 0, -1)
+
 def increment_with_lock(key, field):
     # Acquire a lock
     lock = redis_client.lock(f"{key}_lock", timeout=5)  # Set a timeout to avoid deadlocks
@@ -34,3 +38,6 @@ def modify_with_lock(key, new_value):
     finally:
         # Release the lock
         lock.release()
+    
+def append_to_list(key, new_object_to_append):
+    redis_client.rpush(key, json.dumps(new_object_to_append))
