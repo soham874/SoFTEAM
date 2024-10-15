@@ -1,6 +1,13 @@
 #!/bin/bash
 clear
 
+# Check if Docker is installed
+if ! command -v docker &> /dev/null
+then
+    echo "Docker is not installed. Please install Docker and try again."
+    exit 1
+fi
+
 docker network create my-network
 
 # Check if the redis-server container is running
@@ -29,24 +36,16 @@ else
     echo "Failed to start Redis server on port 6379."
 fi
 
-
-# Check if Docker is installed
-if ! command -v docker &> /dev/null
-then
-    echo "Docker is not installed. Please install Docker and try again."
-    exit 1
-fi
-
 # Build the Docker image
-docker build -t nse_analyser .
+docker build -t softeam .
 
-# Check if a container named 'nse_analyser' exists
-if [ "$(docker ps -aq -f name=nse_analyser)" ]; then
+# Check if a container named 'softeam' exists
+if [ "$(docker ps -aq -f name=softeam)" ]; then
     # If it does, stop it
-    docker stop nse_analyser
+    docker stop softeam
     # Then remove it
-    docker container rm nse_analyser
+    docker container rm softeam
 fi
 
 # Run the Docker container
-docker run --network my-network --name nse_analyser -it -p 8080:8080 nse_analyser
+docker run --network my-network --name softeam -it -p 8080:8080 softeam

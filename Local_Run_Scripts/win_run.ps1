@@ -5,15 +5,15 @@ if (!(Get-Command docker -ErrorAction SilentlyContinue)) {
 }
 
 # Build the Docker image
-docker build -t nse_analyser .
+docker build -t softeam .
 
-# Check if a container named 'nse_analyser' exists
-if (docker ps -aq -f name=nse_analyser) {
+# Check if a container named 'softeam' exists
+if (docker ps -aq -f name=softeam) {
     # If it does, stop it
-    docker stop nse_analyser
+    docker stop softeam
     # Then remove it
-    docker container rm nse_analyser
+    docker container rm softeam
 }
 
 # Run the Docker container
-docker run --name nse_analyser -it -p 8080:8080 nse_analyser
+docker run --name softeam -it -p 8080:8080 softeam
