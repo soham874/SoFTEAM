@@ -26,6 +26,6 @@ RUN addgroup --system --gid 10001 app_grp \
 USER 10000
 
 
-CMD ["gunicorn","--timeout","21600","--workers","1", "app:app", "--bind", "0.0.0.0:8080"]
+CMD ["gunicorn","--timeout","21600","--workers","8", "app:app", "--bind", "0.0.0.0:8080"]
 
 # clear && docker build -t softeam . && docker container rm softeam && docker run --name softeam -it -p 8080:8080 softeam

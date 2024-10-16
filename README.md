@@ -1,5 +1,7 @@
 # SoFTEAM Overview
 
+![SoFTEAM](./static/logo.png)
+
 SoFTEAM stands for SOham's Fundamental and technical Trading Engine and Analyser for Markets. It is a project to analyse current and historic data from the Indian stock exchange, and to provide recommendations and execute trades based on fundamanetal and technical analysis, with possibility to prepare and train models to predict stock trend. 
 
 # Architecture
