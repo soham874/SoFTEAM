@@ -14,3 +14,4 @@ expiring-dict
 bs4
 eventlet
 redis
+debugpy

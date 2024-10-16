@@ -1,7 +1,13 @@
 from flask import Flask, request
 from Service.NewsAnalysis.RssConsumer import RssConsumer
-import os, random, time, time
+import os, random, time, time, debugpy
 from Common.log_config import get_logger
+
+if os.environ["DEBUG_MODE"]== "true":
+    print("Waiting for debugger to attach...")
+    debugpy.listen(("0.0.0.0", 5678))  # Bind to all interfaces on port 5678
+    debugpy.wait_for_client()  # Pause execution until the debugger is attached
+    print("Debugger attached.")
 
 app = Flask(__name__)
 

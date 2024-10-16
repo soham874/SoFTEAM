@@ -1,6 +1,17 @@
 #!/bin/bash
 clear
 
+DEBUG_MODE=false  # Default debug mode is false
+
+# Parse arguments
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --DEBUG) DEBUG_MODE="$2"; shift ;;              # Set debug mode (true/false)
+        *) echo "Unknown parameter passed: $1"; exit 1 ;;
+    esac
+    shift
+done
+
 # Check if Docker is installed
 if ! command -v docker &> /dev/null
 then
@@ -48,4 +59,6 @@ if [ "$(docker ps -aq -f name=softeam)" ]; then
 fi
 
 # Run the Docker container
-docker run --network my-network --name softeam -it -p 8080:8080 softeam
+docker run --network my-network --name softeam -it -p 8080:8080 -p 5678:5678 \
+    -e DEBUG_MODE=$DEBUG_MODE \
+    softeam
