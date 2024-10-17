@@ -6,7 +6,7 @@ SoFTEAM stands for SOham's Fundamental and technical Trading Engine and Analyser
 
 # Architecture
 
-![SoFTEAM Architecture](./Random_Data_Dumps/softeam.png)
+![SoFTEAM Architecture](./Random_Data_Dumps/softeam_new.png)
 
 # Current  Functionalities
 
