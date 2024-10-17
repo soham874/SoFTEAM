@@ -97,6 +97,12 @@ Debug
 chmod 777 Local_Run_Scripts/mac_run.sh && ./Local_Run_Scripts/mac_run.sh --DEBUG=true
 ```
 ## Windows Powershell
+
+Normal
 ```ps1
-Set-ExecutionPolicy Unrestricted ; /Local_Run_Scripts/win_run.ps1
+Set-ExecutionPolicy RemoteSigned -Scope Process -Force; ./Local_Run_Scripts/run.ps1 --DEBUG false
+```
+Debug
+```ps1
+Set-ExecutionPolicy RemoteSigned -Scope Process -Force; ./Local_Run_Scripts/run.ps1 --DEBUG true
 ```
