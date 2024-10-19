@@ -90,11 +90,11 @@ Please ensure docker is installed in your system and added to PATH variable. Exe
 
 Normal
 ```bash
-chmod 777 Local_Run_Scripts/mac_run.sh && ./Local_Run_Scripts/mac_run.sh --DEBUG=false
+chmod 777 Local_Run_Scripts/mac_run.sh && ./Local_Run_Scripts/mac_run.sh --DEBUG false
 ```
 Debug
 ```bash
-chmod 777 Local_Run_Scripts/mac_run.sh && ./Local_Run_Scripts/mac_run.sh --DEBUG=true
+chmod 777 Local_Run_Scripts/mac_run.sh && ./Local_Run_Scripts/mac_run.sh --DEBUG true
 ```
 ## Windows Powershell
 

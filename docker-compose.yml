@@ -1,0 +1,106 @@
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: wurstmeister/kafka:latest
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    expose:
+      - "9093"
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9093,OUTSIDE://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CREATE_TOPICS: "published-news-articles:1:1"
+    depends_on:
+      - zookeeper
+
+  redis:
+    image: redis:latest
+    container_name: redis-server
+    networks:
+      - softeam-network
+    ports:
+      - "6379:6379"
+
+  mission-control:
+    build:
+      context: ./Mission-Control/
+      args:
+        WORKER_COUNT: ${WORKER_COUNT:-8}
+    container_name: Mission-Control
+    networks:
+      - softeam-network
+    ports:
+      - "8081:8081"
+      - "5679:5679"
+    environment:
+      DEBUG_MODE: ${DEBUG_MODE:-false}
+    depends_on:
+      - redis
+      - kafka
+
+  technisight:
+    build:
+      context: ./TechniSight/
+      args:
+        WORKER_COUNT: ${WORKER_COUNT:-8}
+    container_name: TechniSight
+    networks:
+      - softeam-network
+    ports:
+      - "8082:8082"
+      - "5680:5680"
+    environment:
+      DEBUG_MODE: ${DEBUG_MODE:-false}
+    depends_on:
+      - redis
+      - kafka
+
+  trading-engine:
+    build:
+      context: ./Trading-Engine/
+      args:
+        WORKER_COUNT: ${WORKER_COUNT:-8}
+    container_name: Trading-Engine
+    networks:
+      - softeam-network
+    ports:
+      - "8083:8083"
+      - "5681:5681"
+    environment:
+      DEBUG_MODE: ${DEBUG_MODE:-false}
+    depends_on:
+      - redis
+      - kafka
+
+  news-gateway:
+    build:
+      context: ./News-Gateway/
+      args:
+        WORKER_COUNT: ${WORKER_COUNT:-8}
+    container_name: News-Gateway
+    networks:
+      - softeam-network
+    ports:
+      - "8084:8084"
+      - "5682:5682"
+    environment:
+      DEBUG_MODE: ${DEBUG_MODE:-false}
+    depends_on:
+      - redis
+      - kafka
+
+networks:
+  softeam-network:
+    driver: bridge
