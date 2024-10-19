@@ -3,3 +3,7 @@
 # Dockerfile
 *~*
 .DS_Store
+/News-Gateway
+/Mission-Control
+/TechniSight
+/Trading-Engine

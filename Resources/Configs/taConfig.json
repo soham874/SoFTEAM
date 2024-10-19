@@ -1,9 +1,0 @@
-{
-    "volume_ema_duration": 5,
-    "close_ema_duration": 100,
-    "rsi_duration": 14,
-    "macd_slow": 26,
-    "macd_fast": 12,
-    "macd_signal_length": 9,
-    "consider_days_for_ta_report": 5
-}
