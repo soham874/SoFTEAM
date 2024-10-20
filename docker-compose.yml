@@ -79,8 +79,10 @@ services:
     environment:
       DEBUG_MODE: ${DEBUG_MODE:-false}
     depends_on:
-      - redis
-      - kafka
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
 
   trading-engine:
     build:
