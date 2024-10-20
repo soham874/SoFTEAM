@@ -7,6 +7,8 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
     ports:
       - "2181:2181"
+    networks:
+      - softeam-network
 
   kafka:
     image: wurstmeister/kafka:latest
@@ -22,8 +24,16 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_CREATE_TOPICS: "published-news-articles:1:1"
+      KAFKA_ADVERTISED_HOST_NAME: kafka
     depends_on:
       - zookeeper
+    networks:
+      - softeam-network
+    healthcheck:
+      test: ["CMD", "/opt/kafka/bin/kafka-broker-api-versions.sh", "--bootstrap-server", "localhost:9092"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   redis:
     image: redis:latest
@@ -32,6 +42,11 @@ services:
       - softeam-network
     ports:
       - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   mission-control:
     build:
@@ -98,8 +113,10 @@ services:
     environment:
       DEBUG_MODE: ${DEBUG_MODE:-false}
     depends_on:
-      - redis
-      - kafka
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
 
 networks:
   softeam-network:
