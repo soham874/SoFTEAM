@@ -61,9 +61,16 @@ services:
       - "5679:5679"
     environment:
       DEBUG_MODE: ${DEBUG_MODE:-false}
+      DB_PASSWORD: ${DB_PASSWORD}  # Load the database password from .env file
+      API_KEY: ${API_KEY}            # Load the API key from .env file
     depends_on:
-      - redis
-      - kafka
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/signal-all-ready"]  # Adjust this to fit your container's health check logic
+      interval: 15s
+      timeout: 15s
+      retries: 20
 
   technisight:
     build:
@@ -83,6 +90,11 @@ services:
         condition: service_healthy
       kafka:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/health"]  # Adjust this to fit your container's health check logic
+      interval: 15s
+      timeout: 15s
+      retries: 20
 
   trading-engine:
     build:
@@ -98,8 +110,17 @@ services:
     environment:
       DEBUG_MODE: ${DEBUG_MODE:-false}
     depends_on:
-      - redis
-      - kafka
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      mission-control:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/health"]  # Adjust this to fit your container's health check logic
+      interval: 15s
+      timeout: 15s
+      retries: 20
 
   news-gateway:
     build:
@@ -119,6 +140,11 @@ services:
         condition: service_healthy
       kafka:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8084/health"]  # Adjust this to fit your container's health check logic
+      interval: 15s
+      timeout: 15s
+      retries: 20
 
 networks:
   softeam-network:
