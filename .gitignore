@@ -2,6 +2,7 @@
 .ipynb_checkpoints
 # Dockerfile
 *~*
+.env
 .DS_Store
 /News-Gateway
 /Mission-Control

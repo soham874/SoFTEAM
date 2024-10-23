@@ -54,6 +54,8 @@ services:
       args:
         WORKER_COUNT: ${WORKER_COUNT:-8}
     container_name: Mission-Control
+    env_file: 
+      - ./Mission-Control/.env
     networks:
       - softeam-network
     ports:
@@ -61,13 +63,16 @@ services:
       - "5679:5679"
     environment:
       DEBUG_MODE: ${DEBUG_MODE:-false}
-      DB_PASSWORD: ${DB_PASSWORD}  # Load the database password from .env file
-      API_KEY: ${API_KEY}            # Load the API key from .env file
+      UPSTOX_CLIENT_ID: ${UPSTOX_CLIENT_ID}
+      UPSTOX_REDIRECT_URI: ${UPSTOX_REDIRECT_URI}
+      UPSTOX_CLIENT_SECRET: ${UPSTOX_CLIENT_SECRET}
+      KITE_PASSWORD: ${KITE_PASSWORD}
+      KITE_USER_ID: ${KITE_USER_ID}
     depends_on:
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8081/signal-all-ready"]  # Adjust this to fit your container's health check logic
+      test: ["CMD", "curl", "-f", "http://localhost:8081/health"]
       interval: 15s
       timeout: 15s
       retries: 20
@@ -89,6 +94,8 @@ services:
       redis:
         condition: service_healthy
       kafka:
+        condition: service_healthy
+      mission-control:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8082/health"]  # Adjust this to fit your container's health check logic
@@ -139,6 +146,8 @@ services:
       redis:
         condition: service_healthy
       kafka:
+        condition: service_healthy
+      mission-control:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8084/health"]  # Adjust this to fit your container's health check logic
