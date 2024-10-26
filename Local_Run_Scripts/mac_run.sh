@@ -1,6 +1,8 @@
 #!/bin/bash
 clear
 
+docker compose down
+
 DEBUG_MODE=false  # Default debug mode is false
 WORKER_COUNT=8
 

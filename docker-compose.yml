@@ -48,6 +48,28 @@ services:
       timeout: 5s
       retries: 5
 
+  mysql:
+    image: mysql:latest
+    container_name: softeam-sql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: softeam
+      MYSQL_USER: ${MYSQL_USER}          
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}  
+    command: --pid-file=/var/run/mysqld/mysqld.pid # --disable-log-warnings
+    networks:
+      - softeam-network       
+    ports:
+      - "3307:3306"                         
+    volumes:
+      - softeam_db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
   mission-control:
     build:
       context: ./Mission-Control/
@@ -73,6 +95,39 @@ services:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8081/health"]
+      interval: 15s
+      timeout: 15s
+      retries: 20
+
+  market-gateway:
+    build:
+      context: ./Market-Gateway/
+      args:
+        WORKER_COUNT: ${WORKER_COUNT:-8}
+    container_name: Market-Gateway
+    stop_grace_period: 5s
+    networks:
+      - softeam-network
+    ports:
+      - "8085:8085"
+      - "5683:5683"
+    environment:
+      DEBUG_MODE: ${DEBUG_MODE:-false}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: softeam
+      MYSQL_USER: ${MYSQL_USER}          
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}  
+    depends_on:
+      redis:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      mission-control:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8085/health"]
       interval: 15s
       timeout: 15s
       retries: 20
@@ -158,3 +213,6 @@ services:
 networks:
   softeam-network:
     driver: bridge
+
+volumes:
+  softeam_db_data:
