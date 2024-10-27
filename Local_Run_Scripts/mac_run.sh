@@ -1,8 +1,6 @@
 #!/bin/bash
 clear
 
-docker compose down
-
 DEBUG_MODE=false  # Default debug mode is false
 WORKER_COUNT=8
 
@@ -81,9 +79,7 @@ for dir in "${directories[@]}"; do
   fi
 done
 
-while true; do
-    sleep 2
-    clear
-    echo "Current container status ->"
-    docker ps
-done
+docker stats -a
+echo "Allowing grace period of 10 sec before bringing down project..."
+sleep 10
+docker compose down
