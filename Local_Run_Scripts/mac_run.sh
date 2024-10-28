@@ -80,6 +80,6 @@ for dir in "${directories[@]}"; do
 done
 
 docker stats -a
-echo "Allowing grace period of 10 sec before bringing down project..."
-sleep 10
+echo "Allowing grace period of 3 sec before bringing down project..."
+sleep 3
 docker compose down
