@@ -23,7 +23,7 @@ services:
       KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CREATE_TOPICS: "published-news-articles:1:1,live-ohlc-feed:16:1"
+      KAFKA_CREATE_TOPICS: "published-news-articles:16:1,live-ohlc-feed:16:1"
       KAFKA_ADVERTISED_HOST_NAME: kafka
     depends_on:
       - zookeeper
@@ -117,6 +117,8 @@ services:
       MYSQL_DATABASE: softeam
       MYSQL_USER: ${MYSQL_USER}          
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}  
+    volumes:
+      - softeam_runtime_data:/app/data
     depends_on:
       redis:
         condition: service_healthy
@@ -145,6 +147,8 @@ services:
       - "5680:5680"
     environment:
       DEBUG_MODE: ${DEBUG_MODE:-false}
+    volumes:
+      - softeam_runtime_data:/app/data
     depends_on:
       redis:
         condition: service_healthy
@@ -216,3 +220,5 @@ networks:
 
 volumes:
   softeam_db_data:
+  softeam_runtime_data:
+    driver: local
