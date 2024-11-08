@@ -1,18 +1,11 @@
-# Clear the console
+# Clear the screen
 Clear-Host
 
-# Default values
+# Default debug mode and worker count
 $DEBUG_MODE = $false
 $WORKER_COUNT = 8
 
-# Parse arguments
-param (
-    [string]$DEBUG_MODE
-)
-
-if ($DEBUG_MODE -eq "") {
-    $DEBUG_MODE = $false
-}
+Write-Host "Beginning setup of SoFTEAM project from scratch"
 
 # Check if Docker is installed
 if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
@@ -20,64 +13,87 @@ if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
     exit 1
 }
 
-# Define the network name
-$NETWORK_NAME = "softeam-network"
+# Set environment variables
+$env:DEBUG_MODE = $DEBUG_MODE
+$env:WORKER_COUNT = $WORKER_COUNT
 
-# Check if the Docker network exists
-$network = docker network ls | Where-Object { $_ -like "*$NETWORK_NAME*" }
-if (-not $network) {
-    Write-Host "Creating network: $NETWORK_NAME"
-    docker network create $NETWORK_NAME
-} else {
-    Write-Host "Network $NETWORK_NAME already exists."
-}
+# List of directories to work with
+$directories = @("Mission-Control", "Trading-Engine", "News-Gateway", "TechniSight", "Market-Gateway")
 
-# Check if the redis-server container is running
-$redisRunning = docker ps -q -f name=redis-server
-if ($redisRunning) {
-    Write-Host "Redis server is already running."
-} else {
-    Write-Host "Redis server is not running. Checking for existing containers..."
-    
-    # Check if any Redis container is stopped
-    $redisStopped = docker ps -aq -f status=exited -f name=redis-server
-    if ($redisStopped) {
-        Write-Host "Starting existing redis-server container..."
-        docker start redis-server
+# Loop through each directory and delete Common-Utils
+foreach ($dir in $directories) {
+    $commonUtilsPath = "$dir\Common-Utils"
+    if (Test-Path -Path $commonUtilsPath) {
+        Remove-Item -Recurse -Force -Path $commonUtilsPath
+        Write-Host "Deleted Common-Utils from $dir"
     } else {
-        Write-Host "Pulling Redis image and starting a new container..."
-        docker pull redis:latest
-        
-        # Start the redis-server container
-        docker run -d --network $NETWORK_NAME --name redis-server -it -p 6379:6379 redis:latest
+        Write-Host "Common-Utils does not exist in $dir"
     }
 }
 
-# Check if Redis is running on port 6379
-if (Test-NetConnection -ComputerName localhost -Port 6379).TcpTestSucceeded {
-    Write-Host "Redis server is running on port 6379."
-} else {
-    Write-Host "Failed to start Redis server on port 6379."
+# Loop through each directory and copy Common-Utils
+foreach ($dir in $directories) {
+    if (Test-Path -Path $dir) {
+        if (Test-Path -Path "Common-Utils") {
+            Copy-Item -Recurse -Path "Common-Utils" -Destination "$dir\Common-Utils"
+            Write-Host "Copied Common-Utils into $dir"
+        } else {
+            Write-Host "Common-Utils directory does not exist"
+        }
+    } else {
+        Write-Host "Directory $dir does not exist"
+    }
 }
 
-# Adjust worker count in debug mode
-if ($DEBUG_MODE -eq "true") {
-    Write-Host "Starting application in debug mode with 1 worker"
-    $WORKER_COUNT = 1
+# Root .env file path
+$rootEnv = ".\.env"
+
+# Remove the root .env file if it already exists
+if (Test-Path -Path $rootEnv) {
+    Remove-Item -Path $rootEnv
+    Write-Host "Existing root .env file removed."
 }
 
-# Build the Docker image
-docker build --build-arg WORKER_COUNT=$WORKER_COUNT -t softeam .
-
-# Check if the container named 'softeam' exists
-$softeamContainer = docker ps -aq -f name=softeam
-if ($softeamContainer) {
-    # Stop and remove existing container
-    docker stop softeam
-    docker container rm softeam
+# Loop through each directory and append the content of its .env file to the root .env
+foreach ($dir in $directories) {
+    $envFile = "$dir\.env"
+    if (Test-Path -Path $envFile) {
+        Get-Content -Path $envFile | Add-Content -Path $rootEnv
+        Write-Host "Appended $envFile to root .env"
+    } else {
+        Write-Host "$envFile does not exist, skipping..."
+    }
 }
 
-# Run the Docker container
-docker run --network $NETWORK_NAME --name softeam -it -p 8080:8080 -p 5678:5678 `
-    -e DEBUG_MODE=$DEBUG_MODE `
-    softeam
+Write-Host "All .env files merged into $rootEnv."
+
+# Build and run containers
+docker-compose up --build -d
+
+# Remove the root .env file if it exists
+if (Test-Path -Path $rootEnv) {
+    Remove-Item -Path $rootEnv
+    Write-Host "Existing root .env file removed."
+}
+
+Write-Host "Services created, copied env variables, and Common-Utils packages removed."
+
+# Loop through each directory and delete Common-Utils again
+foreach ($dir in $directories) {
+    $commonUtilsPath = "$dir\Common-Utils"
+    if (Test-Path -Path $commonUtilsPath) {
+        Remove-Item -Recurse -Force -Path $commonUtilsPath
+        Write-Host "Deleted Common-Utils from $dir"
+    } else {
+        Write-Host "Common-Utils does not exist in $dir"
+    }
+}
+
+# Display docker stats
+docker stats --all
+
+Write-Host "Allowing grace period of 3 seconds before bringing down project..."
+Start-Sleep -Seconds 3
+
+# Stop and remove containers
+docker-compose down
