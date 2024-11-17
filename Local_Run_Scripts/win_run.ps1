@@ -88,12 +88,3 @@ foreach ($dir in $directories) {
         Write-Host "Common-Utils does not exist in $dir"
     }
 }
-
-# Display docker stats
-docker stats --all
-
-Write-Host "Allowing grace period of 3 seconds before bringing down project..."
-Start-Sleep -Seconds 3
-
-# Stop and remove containers
-docker-compose down

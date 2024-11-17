@@ -161,6 +161,10 @@ services:
       - "5680:5680"
     environment:
       DEBUG_MODE: ${DEBUG_MODE:-false}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: softeam
+      MYSQL_USER: ${MYSQL_USER}          
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}  
     volumes:
       - softeam_runtime_data:/app/data
     depends_on:
