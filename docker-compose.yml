@@ -66,6 +66,7 @@ services:
       MYSQL_DATABASE: softeam
       MYSQL_USER: ${MYSQL_USER}          
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}  
+      TZ: "Asia/Kolkata"
     command: --pid-file=/var/run/mysqld/mysqld.pid
     networks:
       - softeam-network       
@@ -73,6 +74,9 @@ services:
       - "3307:3306"                         
     volumes:
       - softeam_db_data:/var/lib/mysql
+      - ./SQL-scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+      # - ./SQL-scripts/dump_to_csv.sh:/docker-entrypoint-initdb.d/dump_to_csv.sh  # Dump script
+      # - ./csv_dumps:/var/lib/mysql-files        # Dump storage 
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
