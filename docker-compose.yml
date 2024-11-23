@@ -193,6 +193,10 @@ services:
       - "5681:5681"
     environment:
       DEBUG_MODE: ${DEBUG_MODE:-false}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: softeam
+      MYSQL_USER: ${MYSQL_USER}          
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}  
     depends_on:
       redis:
         condition: service_healthy
