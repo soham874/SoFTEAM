@@ -38,7 +38,7 @@ CREATE TABLE softeam.matching_logic_analysis (
 	passed_company_name varchar(100) NOT NULL,
 	clean_company_name varchar(100) NOT NULL,
 	match_found BIT NOT NULL,
-	matched_company_name varchar(100) NOT NULL,
+	matched_company_name varchar(100),
 	fuzzy_score INT NULL,
 	message varchar(500) NULL,
 	trading_symbol varchar(100) NULL,

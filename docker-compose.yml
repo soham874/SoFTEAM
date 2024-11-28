@@ -98,6 +98,7 @@ services:
       - "8081:8081"
       - "5679:5679"
     environment:
+      SERVICE_NAME: mission-control
       DEBUG_MODE: ${DEBUG_MODE:-false}
       UPSTOX_CLIENT_ID: ${UPSTOX_CLIENT_ID}
       UPSTOX_REDIRECT_URI: ${UPSTOX_REDIRECT_URI}
@@ -126,6 +127,7 @@ services:
       - "8085:8085"
       - "5683:5683"
     environment:
+      SERVICE_NAME: market-gateway
       DEBUG_MODE: ${DEBUG_MODE:-false}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: softeam
@@ -160,6 +162,7 @@ services:
       - "8082:8082"
       - "5680:5680"
     environment:
+      SERVICE_NAME: technisight
       DEBUG_MODE: ${DEBUG_MODE:-false}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: softeam
@@ -192,6 +195,7 @@ services:
       - "8083:8083"
       - "5681:5681"
     environment:
+      SERVICE_NAME: trading-engine
       DEBUG_MODE: ${DEBUG_MODE:-false}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: softeam
@@ -222,6 +226,7 @@ services:
       - "8084:8084"
       - "5682:5682"
     environment:
+      SERVICE_NAME: news-gateway
       DEBUG_MODE: ${DEBUG_MODE:-false}
     depends_on:
       redis:
