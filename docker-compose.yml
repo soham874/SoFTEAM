@@ -48,15 +48,15 @@ services:
       timeout: 5s
       retries: 5
   
-  rebrow:
-    image: marian/rebrow
-    container_name: rebrow
-    ports:
-      - "5001:5001"
-    networks:
-      - softeam-network
-    depends_on:
-      - redis
+  # rebrow:
+  #   image: marian/rebrow
+  #   container_name: rebrow
+  #   ports:
+  #     - "5001:5001"
+  #   networks:
+  #     - softeam-network
+  #   depends_on:
+  #     - redis
 
   mysql:
     image: mysql:latest
