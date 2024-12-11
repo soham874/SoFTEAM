@@ -241,6 +241,33 @@ services:
       timeout: 15s
       retries: 20
 
+  portfolio-risk-manager:
+    build:
+      context: ./Portfolio-Risk-Manager/
+      args:
+        WORKER_COUNT: ${WORKER_COUNT:-8}
+    container_name: Portfolio-Risk-Manager
+    networks:
+      - softeam-network
+    ports:
+      - "8086:8086"
+      - "5684:5684"
+    environment:
+      SERVICE_NAME: news-gateway
+      DEBUG_MODE: ${DEBUG_MODE:-false}
+    depends_on:
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      mission-control:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8086/health"]  # Adjust this to fit your container's health check logic
+      interval: 15s
+      timeout: 15s
+      retries: 20
+
 networks:
   softeam-network:
     driver: bridge

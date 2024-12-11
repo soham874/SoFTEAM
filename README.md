@@ -56,3 +56,5 @@ Debug
 ```ps1
 Set-ExecutionPolicy RemoteSigned -Scope Process -Force; ./Local_Run_Scripts/run.ps1 --DEBUG true
 ```
+
+Confluence - https://softeam874.atlassian.net/wiki/spaces/SOfTEAM/overview

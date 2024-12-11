@@ -18,7 +18,7 @@ $env:DEBUG_MODE = $DEBUG_MODE
 $env:WORKER_COUNT = $WORKER_COUNT
 
 # List of directories to work with
-$directories = @("Mission-Control", "Trading-Engine", "News-Gateway", "TechniSight", "Market-Gateway")
+$directories = @("Mission-Control", "Trading-Engine", "News-Gateway", "TechniSight", "Market-Gateway", "Portfolio-Risk-Manager")
 
 # Loop through each directory and delete Common-Utils
 foreach ($dir in $directories) {
