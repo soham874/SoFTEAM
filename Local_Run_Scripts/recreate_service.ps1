@@ -24,6 +24,17 @@ try {
     exit 1
 }
 
+# Root .env file path
+$rootEnv = ".\.env"
+
+$envFile = "$DestinationFolder\.env"
+if (Test-Path -Path $envFile) {
+    Get-Content -Path $envFile | Add-Content -Path $rootEnv
+    Write-Host "Appended $envFile to root .env"
+} else {
+    Write-Host "$envFile does not exist, skipping..."
+}
+
 # Run the Docker Compose command to recreate the container
 $DockerCommand = "docker compose up -d --no-deps --build --force-recreate $ContainerName"
 try {

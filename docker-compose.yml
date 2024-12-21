@@ -23,7 +23,7 @@ services:
       KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CREATE_TOPICS: "published-news-articles:16:1,live-ohlc-feed:16:1,suggested-trades:16:1"
+      KAFKA_CREATE_TOPICS: "published-news-articles:16:1,live-ohlc-feed:16:1,suggested-trades:16:1,trade-orders:16:1"
       KAFKA_ADVERTISED_HOST_NAME: kafka
     depends_on:
       - zookeeper
@@ -253,7 +253,7 @@ services:
       - "8086:8086"
       - "5684:5684"
     environment:
-      SERVICE_NAME: news-gateway
+      SERVICE_NAME: portfolio-risk-manager
       DEBUG_MODE: ${DEBUG_MODE:-false}
     depends_on:
       redis:

@@ -46,3 +46,12 @@ CREATE TABLE softeam.matching_logic_analysis (
 	created_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	CONSTRAINT matching_logic_analysis_pk PRIMARY KEY (id)
 );
+
+-- Table to store missed analyst articles
+CREATE TABLE softeam.missed_analyst (
+	id BIGINT auto_increment NOT NULL,
+	analyst_name varchar(100) NOT NULL,
+	article_url varchar(1000) NOT NULL,
+	article_title varchar(500) NOT NULL,
+	CONSTRAINT missed_analyst_pk PRIMARY KEY (id)
+);
